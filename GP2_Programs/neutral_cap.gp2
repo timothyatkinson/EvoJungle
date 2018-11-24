@@ -1,0 +1,176 @@
+Main = markOutputs!; markInputs!; markActive!; initNCounter; countNeutral!; ([pickDelete]; deleteEdges!; deleteNode)!; unmark!
+
+markOutputs
+(
+  a : list
+)
+[
+  (n0, a : "OUT")
+  |
+]
+=>
+[
+  (n0, a : "OUT" #red)
+  |
+]
+interface = {
+  n0
+}
+
+markInputs
+(
+  a : list
+)
+[
+  (n0, a : "IN")
+  |
+]
+=>
+[
+  (n0, a : "IN" #red)
+  |
+]
+interface = {
+  n0
+}
+
+markActive
+(
+  a, b, c : list
+)
+[
+  (n0, a#red)
+  (n1, b)
+  |
+  (e0, n0, n1, c)
+]
+=>
+[
+  (n0, a#red)
+  (n1, b#red)
+  |
+  (e0, n0, n1, c)
+]
+interface = {
+  n0, n1
+}
+
+initNCounter
+(
+  y : int
+)
+[
+  (n1(R), "MaxNeutral":y)
+  |
+]
+=>
+[
+  (n1(R), "MaxNeutral":y)
+  (n0(R), "Neutral":0)
+  |
+]
+interface = {
+  n1
+}
+
+countNeutral
+(
+  a : list;
+  s : string;
+  x : int
+)
+[
+  (n0(R), "Neutral":x)
+  (n1, a : s)
+  |
+]
+=>
+[
+  (n0(R), "Neutral":x+1)
+  (n1, a : s#grey)
+  |
+]
+interface = {
+  n0, n1
+}
+where s != "IN"
+
+pickDelete
+(
+  a : list;
+  x, y : int
+)
+[
+  (n0, a#grey)
+  (n1(R), "Neutral":x)
+  (n2(R), "MaxNeutral":y)
+  |
+]
+=>
+[
+  (n0, a#blue)
+  (n1(R), "Neutral":x - 1)
+  (n2(R), "MaxNeutral":y)
+  |
+]
+interface = {
+  n0, n1, n2
+}
+where indeg(n0) = 0 and x > y
+
+deleteEdges
+(
+  a, b, c : list
+)
+[
+  (n0, a#blue)
+  (n1, b#any)
+  |
+  (e0, n0, n1, c)
+]
+=>
+[
+  (n0, a#blue)
+  (n1, b#any)
+  |
+]
+interface = {
+  n0, n1
+}
+
+deleteNode
+(
+  a : list;
+  x : int
+)
+[
+  (n0, a#blue)
+  (n1(R), "Neutral":x)
+  |
+]
+=>
+[
+  (n1(R), "Neutral":x)
+  |
+]
+interface = {
+  n1
+}
+
+
+unmark
+(
+  a : list
+)
+[
+  (n0, a#any)
+  |
+]
+=>
+[
+  (n0, a)
+  |
+]
+interface = {
+  n0
+}

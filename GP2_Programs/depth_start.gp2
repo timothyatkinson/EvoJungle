@@ -1,0 +1,64 @@
+Main = {initInput, initOutput}!; initNode!; unmark!
+
+initInput
+(
+  a : list
+)
+[
+  (n0, a:"IN")
+  |
+]
+=>
+[
+  (n0, a:0:0:"IN"#red)
+  |
+]
+interface = { n0 }
+
+initOutput
+(
+  a : list
+)
+[
+  (n0, a:"OUT")
+  |
+]
+=>
+[
+  (n0, a:0:-1:"OUT"#red)
+  |
+]
+interface = { n0 }
+
+initNode
+(
+  a : list;
+  s : string
+)
+[
+  (n0, a:s)
+  |
+]
+=>
+[
+  (n0, a:0:0:s#red)
+  |
+]
+interface = { n0 }
+
+unmark
+(
+  a : list
+)
+[
+  (n0, a#red)
+  |
+]
+=>
+[
+  (n0, a)
+  |
+]
+interface = {
+  n0
+}
