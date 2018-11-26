@@ -3,7 +3,6 @@
 #include "graphStacks.h"
 #include "parser.h"
 #include "morphism.h"
-#include "common.h"
 
 bool matchlocal_node_crossover_makeGreyRed(Morphism *morphism);
 

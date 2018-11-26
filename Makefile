@@ -11,7 +11,7 @@ CFLAGS = -I$(INCDIR) -L $(LIBDIR) -O2 -lgp2 -lm -g -fsplit-stack
 
 symreg:	$(OBJECTS) symbolic_regression_experiment.c
 		rm -f -r $(GP2_FILES);	mkdir $(GP2_FILES);
-		$(foreach var,$(GP2_OBJECTS),mkdir $(GP2_FILES)/$(var);	echo '$(var) compile'; $(PGP2DIR)/bin/gp2 -l $(PGP2DIR) -m $(var) -o $(GP2_FILES)/$(var) $(GP2_PROGRAMS)/$(var).gp2; )
+		$(foreach var,$(GP2_OBJECTS),mkdir $(GP2_FILES)/$(var);	echo '$(var) compile'; $(PGP2DIR)/bin/gp2 -l $(PGP2DIR) -m $(var) -o $(GP2_FILES)/$(var)  $(GP2_PROGRAMS)/$(var).gp2; )
 		$(CC) symbolic_regression_experiment.c $(OBJECTS) $(foreach var,$(GP2_OBJECTS), $(GP2_FILES)/$(var)/*.c) $(CFLAGS) -o symreg
 
 symreg-clean:

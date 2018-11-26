@@ -175,7 +175,7 @@ void unmark_graph(Graph* hostG){
 
 Graph* build_empty_host_graph()
 {
-   Graph* new_host = newGraph(150, 300);
+   Graph* new_host = newGraph(300, 450);
    return new_host;
 }
 
@@ -230,97 +230,50 @@ int random_int(int min, int max){
 
 void make_depth(Graph* graph){
   depth_start_execute(graph);
+  int counter;
 
-  //Go down
-  int* queue = malloc(graph->nodes.size * sizeof(int));
-  int* depthDown = malloc(graph->nodes.size * sizeof(int));
-  for(int host_index = 0; host_index < graph->nodes.size; host_index++){
-    depthDown[host_index] = 1;
-  }
-  for(int host_index = 0; host_index < graph->nodes.size; host_index++){
-    Node* host_node = getNode(graph, host_index);
-    queue[host_index] = 0;
-    if(host_node == NULL || host_node->index == -1) continue;
-    HostLabel label = host_node->label;
-    if(strcmp(label.list->last->atom.str, "OUT") == 0){
-      depthDown[host_index] = 0;
-    }
-    if(host_node->indegree == 0){
-      queue[host_index] = 1;
-    }
-  }
-  int empty = 0;
-  while(empty == 0){
-    empty = 1;
-    int* new_queue = malloc(graph->nodes.size * sizeof(int));
-    for(int host_index = 0; host_index < graph->nodes.size; host_index++){
-      new_queue[host_index] = 0;
-    }
-    for(int host_index = 0; host_index < graph->nodes.size; host_index++){
-      Node* host_node = getNode(graph, host_index);
-      if(host_node == NULL || host_node->index == -1 || queue[host_index] == 0 || host_node->outdegree == 0) continue;
-      HostLabel label = host_node->label;
-      int counter;
-      for(counter = 0; counter < host_node->out_edges.size + 2; counter++)
-      {
-        Edge *host_edge = getNthOutEdge(graph, host_node, counter);
-        if(host_edge == NULL || host_edge->index == -1) continue;
-        Node *target = getNode(graph, host_edge->target);
-        int index = target->index;
-        if(depthDown[index] < depthDown[host_index] + 1 || (depthDown[host_index] == 0 && depthDown[index] == 1)){
-          depthDown[index] = depthDown[host_index] + 1;
-          new_queue[target->index] = 1;
-          empty = 0;
-        }
-      }
-    }
-    free(queue);
-    queue = new_queue;
-  }
-  free(queue);
-  queue = malloc(graph->nodes.size * sizeof(int));
   int* depthUp = malloc(graph->nodes.size * sizeof(int));
-  for(int host_index = 0; host_index < graph->nodes.size; host_index++){
-    depthUp[host_index] = 1;
-  }
-  for(int host_index = 0; host_index < graph->nodes.size; host_index++){
-    Node* host_node = getNode(graph, host_index);
-    queue[host_index] = 0;
+  int* depthDown = malloc(graph->nodes.size * sizeof(int));
+  for(int i = 0; i < graph->nodes.size; i++){
+    Node* host_node = getNode(graph, i);
+    depthDown[i] = 1;
+    depthUp[i] = 1;
     if(host_node == NULL || host_node->index == -1) continue;
+
     HostLabel label = host_node->label;
-    if(host_node->outdegree == 0){
-      queue[host_index] = 1;
+    HostListItem *item = label.list->last;
+    if(item->atom.type != 's') break;
+    if(strcmp(item->atom.str, "OUT") == 0){
+      depthDown[i] = 0;
     }
   }
-  empty = 0;
-  while(empty == 0){
-    empty = 1;
-    int* new_queue = malloc(graph->nodes.size * sizeof(int));
-    for(int host_index = 0; host_index < graph->nodes.size; host_index++){
-      new_queue[host_index] = 0;
-    }
-    for(int host_index = 0; host_index < graph->nodes.size; host_index++){
-      Node* host_node = getNode(graph, host_index);
-      if(host_node == NULL || host_node->index == -1 || queue[host_index] == 0 || host_node->indegree == 0) continue;
-      HostLabel label = host_node->label;
-      int counter;
-      for(counter = 0; counter < host_node->in_edges.size + 2; counter++)
-      {
-        Edge *host_edge = getNthInEdge(graph, host_node, counter);
-        if(host_edge == NULL || host_edge->index == -1) continue;
-        Node *source = getNode(graph, host_edge->source);
-        int index = source->index;
-        if(depthUp[index] < depthUp[host_index] + 1){
-          depthUp[index] = depthUp[host_index] + 1;
-          new_queue[source->index] = 1;
-          empty = 0;
-        }
+
+  int* top = topological_sort(graph);
+  int* rev = reverse_topological_sort(graph);
+
+  for(int i = 0; i < graph->number_of_nodes; i++){
+    Node* up_node = getNode(graph, rev[i]);
+    Node* down_node = getNode(graph, top[i]);
+   for(counter = 0; counter < down_node->out_edges.size + 2; counter++)
+   {
+       Edge *host_edge = getNthOutEdge(graph, down_node, counter);
+       if(host_edge == NULL) continue;
+       int target = host_edge->target;
+       if(depthDown[top[i]] + 1 >= depthDown[target]){
+         depthDown[target] = depthDown[top[i]]+1;
+       }
+   }
+    for(counter = 0; counter < up_node->in_edges.size + 2; counter++)
+    {
+      Edge *host_edge = getNthInEdge(graph, up_node, counter);
+      if(host_edge == NULL) continue;
+      int source = host_edge->source;
+      if(depthUp[rev[i]] + 1 >= depthUp[source]){
+        depthUp[source] = depthUp[rev[i]]+1;
       }
     }
-    free(queue);
-    queue = new_queue;
   }
-  free(queue);
+
   for(int host_index = 0; host_index < graph->nodes.size; host_index++){
     Node* host_node = getNode(graph, host_index);
     if(host_node == NULL || host_node->index == -1) continue;
@@ -335,6 +288,8 @@ void make_depth(Graph* graph){
   }
   free(depthUp);
   free(depthDown);
+  free(top);
+  free(rev);
 }
 
 int depth(Graph* graph){
@@ -380,4 +335,95 @@ int depth(Graph* graph){
   free(queue);
   unmark_graph(graph);
   return depth - 2;
+}
+
+//Performs a topological sort on a graph in O(v + e) time.
+int* topological_sort(Graph* host){
+
+
+  int counter;
+  //The actual array to return
+  int* order = malloc(host->number_of_nodes * sizeof(int));
+
+  //Tracking how many incoming edges have been prepared for each node.
+  int* ready = malloc(host->nodes.size * sizeof(int));
+  for(int i = 0; i < host->nodes.size; i++){
+    ready[i] = 0;
+  }
+
+  //Queue for nodes to do BFS for
+  int* queue = malloc(host->nodes.size * sizeof(int));
+  int queue_head = 0;
+  int queue_tail = 0;
+
+  int up_to = 0;
+  //Find roots
+  for(int host_index = 0; host_index < host->nodes.size; host_index++)
+	{
+		 Node *host_node = getNode(host, host_index);
+		 if(host_node == NULL || host_node->index == -1) continue;
+     if(host_node->indegree == 0){
+         //We have found a root node
+         order[up_to] = host_index;
+         up_to++;
+
+         //Update ready according to outgoing edges.
+        for(counter = 0; counter < host_node->out_edges.size + 2; counter++)
+        {
+            Edge *host_edge = getNthOutEdge(host, host_node, counter);
+            if(host_edge == NULL) continue;
+            int target = host_edge->target;
+            ready[target]++;
+            Node* target_node = getNode(host, target);
+            if(ready[target] >= target_node->indegree){
+              queue[queue_tail] = target;
+              queue_tail++;
+            }
+        }
+     }
+	}
+
+  //Move through queue
+  while (queue_tail > queue_head){
+
+    int node = queue[queue_head];
+
+    //Get node
+    Node* host_node = getNode(host, node);
+
+    //Add to our sorted array
+    order[up_to] = node;
+    up_to++;
+
+    //Update ready according to outgoing edges.
+    for(counter = 0; counter < host_node->out_edges.size + 2; counter++)
+    {
+       Edge *host_edge = getNthOutEdge(host, host_node, counter);
+       if(host_edge == NULL) continue;
+       int target = host_edge->target;
+       ready[target]++;
+       Node* target_node = getNode(host, target);
+       if(ready[target] >= target_node->indegree){
+         queue[queue_tail] = target;
+         queue_tail++;
+       }
+    }
+
+    queue_head++;
+  }
+
+  free(ready);
+  free(queue);
+  return order;
+}
+
+//Performs a reverse topological sort in O(v + e) time. Uses the topological_sort function and then reverses the result.
+int* reverse_topological_sort(Graph* host){
+  int* top = topological_sort(host);
+  int* rev = malloc(host->number_of_nodes * sizeof(int));
+  for(int i = 0; i < host->number_of_nodes; i++){
+    rev[i] = top[host->number_of_nodes - (i + 1)];
+  }
+  free(top);
+  return rev;
 }

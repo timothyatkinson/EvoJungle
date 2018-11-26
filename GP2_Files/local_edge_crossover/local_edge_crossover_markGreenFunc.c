@@ -2,14 +2,14 @@
 
 #include "local_edge_crossover.h"
 
-bool local_edge_crossover_b1 = true;
+bool local_edge_crossover_b2 = true;
 
 static bool evaluateCondition(void)
 {
-   return (local_edge_crossover_b1);
+   return (local_edge_crossover_b2);
 }
 
-static void evaluatePredicatelocal_edge_crossover_1(Morphism *morphism)
+static void evaluatePredicatelocal_edge_crossover_2(Morphism *morphism)
 {
    Assignment assignment_3 = getAssignment(morphism, 3);
    /* If the variable is not yet assigned, return. */
@@ -32,8 +32,8 @@ static void evaluatePredicatelocal_edge_crossover_1(Morphism *morphism)
    array1[index1].type = 's';
    array1[index1++].str = "IN";
 
-   if(!equalHostLists(array0, array1, list_length0, list_length1)) local_edge_crossover_b1 = true;
-   else local_edge_crossover_b1 = false;
+   if(!equalHostLists(array0, array1, list_length0, list_length1)) local_edge_crossover_b2 = true;
+   else local_edge_crossover_b2 = false;
 }
 
 static bool match_n0(Morphism *morphism);
@@ -199,11 +199,11 @@ static bool match_n1(Morphism *morphism, Edge *host_edge)
       {
          new_assignments += result;
          /* Update global booleans for the variable's predicates. */
-         evaluatePredicatelocal_edge_crossover_1(morphism);
+         evaluatePredicatelocal_edge_crossover_2(morphism);
          if(!evaluateCondition())
          {
             /* Reset the boolean variables in the predicates of this variable. */
-            local_edge_crossover_b1 = true;
+            local_edge_crossover_b2 = true;
             break;
          }
       }
@@ -429,11 +429,11 @@ static bool fillpot_n1(MorphismPot *pot, Morphism *morphism, Edge *host_edge)
       {
          new_assignments += result;
          /* Update global booleans for the variable's predicates. */
-         evaluatePredicatelocal_edge_crossover_1(morphism);
+         evaluatePredicatelocal_edge_crossover_2(morphism);
          if(!evaluateCondition())
          {
             /* Reset the boolean variables in the predicates of this variable. */
-            local_edge_crossover_b1 = true;
+            local_edge_crossover_b2 = true;
             break;
          }
       }

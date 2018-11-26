@@ -105,13 +105,28 @@ int main(void){
     char train[50];
     char validation[50];
     char test[50];
+    char out[50];
     strcpy(train, d_names[i]);
     strcpy(validation, d_names[i]);
     strcpy(test, d_names[i]);
+    strcpy(out, d_names[i]);
     strcat(train, "TrainingT1000V30.txt");
     strcat(validation, "ValidationT1000V30.txt");
     strcat(test, "Test.txt");
-    printf("Running on files %s, %s, %s\n", train, validation, test);
+    strcat(out, "Results.csv");
+    out[0] = 'R';
+    out[1] = 'e';
+    out[2] = 's';
+    out[3] = 'u';
+    out[4] = 'l';
+    out[5] = 't';
+    out[6] = 'S';
+    out[7] = 'P';
+    printf("Running on files %s, %s, %s -> %s\n", train, validation, test, out);
+
+    double** this_res = malloc(2 * sizeof(double*));
+    this_res[0] = malloc(runs * sizeof(double));
+    this_res[1] = malloc(runs * sizeof(double));
 
     printf("Loading Datasets\n");
     //No noise
@@ -123,20 +138,22 @@ int main(void){
     GP_Dataset* validation_d_n = load_sr_dataset(validation, d_inputs[i], validation_entries, 2);
     GP_Dataset* test_d_n = load_sr_dataset(test, d_inputs[i], test_entries, 0);
 
-    printf("Running - No Noise\n");
+    printf("Running - No Noise (SP)\n");
     for(int j = 0; j < runs; j++){
       printf("Run %d\n", j);
-      double test_mse = tournament_elitism(train_d, validation_d, test_d, fset, 100, 10, 50, 0.5, 0.04, 20, 4, 1250);
+      double test_mse = tournament_elitism(train_d, validation_d, test_d, fset, 100, 10, 50, 0.5, 0.04, 20, 4, 1310);
       printf("Final test MSE = %.10e\n", test_mse);
       res[2 * i][j] = test_mse;
+      this_res[0][j] = res[2 * i][j];
     }
 
     printf("Running - Noise\n");
     for(int j = 0; j < runs; j++){
       printf("Run %d\n", j);
-      double test_mse = tournament_elitism(train_d_n, validation_d_n, test_d_n, fset, 100, 10, 50, 0.5, 0.04, 20, 4, 1250);
+      double test_mse = tournament_elitism(train_d_n, validation_d_n, test_d_n, fset, 100, 10, 50, 0.5, 0.04, 20, 4, 1310);
       printf("Final test MSE = %.10e\n", test_mse);
       res[(2 * i) + 1][j] = test_mse;
+      this_res[1][j] = res[(2 * i) + 1][j];
     }
 
     printf("Freeing Datasets\n");
@@ -146,9 +163,11 @@ int main(void){
     free_dataset(train_d_n);
     free_dataset(validation_d_n);
     free_dataset(test_d_n);
+
+    print_to_csv_file(out, this_res, 2, runs);
   }
 
-  print_to_csv_file("Results/symres_results_sp.csv", res, 42, 100);
+  print_to_csv_file("Results/symres_results_sp.csv", res, 42, runs);
 
   free_dataset_names(d_names);
   free(d_inputs);

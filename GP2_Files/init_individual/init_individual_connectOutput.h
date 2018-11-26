@@ -3,7 +3,6 @@
 #include "graphStacks.h"
 #include "parser.h"
 #include "morphism.h"
-#include "common.h"
 
 bool matchinit_individual_connectOutput(Morphism *morphism);
 

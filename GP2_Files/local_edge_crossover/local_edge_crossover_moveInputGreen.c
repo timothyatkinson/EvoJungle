@@ -2,14 +2,14 @@
 
 #include "local_edge_crossover.h"
 
-bool local_edge_crossover_b2 = true;
+bool local_edge_crossover_b3 = true;
 
 static bool evaluateCondition(void)
 {
-   return (local_edge_crossover_b2);
+   return (local_edge_crossover_b3);
 }
 
-static void evaluatePredicatelocal_edge_crossover_2(Morphism *morphism)
+static void evaluatePredicatelocal_edge_crossover_3(Morphism *morphism)
 {
    Assignment assignment_4 = getAssignment(morphism, 4);
    /* If the variable is not yet assigned, return. */
@@ -21,8 +21,8 @@ static void evaluatePredicatelocal_edge_crossover_2(Morphism *morphism)
    if(assignment_5.type == 'n') return;
    int var_5 = getIntegerValue(morphism, 5);
 
-   if(var_4 == var_5) local_edge_crossover_b2 = true;
-   else local_edge_crossover_b2 = false;
+   if(var_4 == var_5) local_edge_crossover_b3 = true;
+   else local_edge_crossover_b3 = false;
 }
 
 static bool match_n0(Morphism *morphism);
@@ -181,11 +181,11 @@ static bool match_n1(Morphism *morphism, Edge *host_edge)
       {
          new_assignments += result;
          /* Update global booleans for the variable's predicates. */
-         evaluatePredicatelocal_edge_crossover_2(morphism);
+         evaluatePredicatelocal_edge_crossover_3(morphism);
          if(!evaluateCondition())
          {
             /* Reset the boolean variables in the predicates of this variable. */
-            local_edge_crossover_b2 = true;
+            local_edge_crossover_b3 = true;
             break;
          }
       }
@@ -282,11 +282,11 @@ static bool match_n2(Morphism *morphism)
          {
             new_assignments += result;
             /* Update global booleans for the variable's predicates. */
-            evaluatePredicatelocal_edge_crossover_2(morphism);
+            evaluatePredicatelocal_edge_crossover_3(morphism);
             if(!evaluateCondition())
             {
                /* Reset the boolean variables in the predicates of this variable. */
-               local_edge_crossover_b2 = true;
+               local_edge_crossover_b3 = true;
                break;
             }
          }
@@ -570,11 +570,11 @@ static bool fillpot_n1(MorphismPot *pot, Morphism *morphism, Edge *host_edge)
       {
          new_assignments += result;
          /* Update global booleans for the variable's predicates. */
-         evaluatePredicatelocal_edge_crossover_2(morphism);
+         evaluatePredicatelocal_edge_crossover_3(morphism);
          if(!evaluateCondition())
          {
             /* Reset the boolean variables in the predicates of this variable. */
-            local_edge_crossover_b2 = true;
+            local_edge_crossover_b3 = true;
             break;
          }
       }
@@ -671,11 +671,11 @@ static bool fillpot_n2(MorphismPot *pot, Morphism *morphism)
          {
             new_assignments += result;
             /* Update global booleans for the variable's predicates. */
-            evaluatePredicatelocal_edge_crossover_2(morphism);
+            evaluatePredicatelocal_edge_crossover_3(morphism);
             if(!evaluateCondition())
             {
                /* Reset the boolean variables in the predicates of this variable. */
-               local_edge_crossover_b2 = true;
+               local_edge_crossover_b3 = true;
                break;
             }
          }

@@ -8,12 +8,15 @@
 
 #include "remove_depth_removeDepth.h"
 Morphism *M_remove_depth_removeDepth = NULL;
+#include "remove_depth_removeDepth2.h"
+Morphism *M_remove_depth_removeDepth2 = NULL;
 #include "remove_depth_unmark.h"
 Morphism *M_remove_depth_unmark = NULL;
 
 static void remove_depth_freeMorphisms(void)
 {
    freeMorphism(M_remove_depth_removeDepth);
+   freeMorphism(M_remove_depth_removeDepth2);
    freeMorphism(M_remove_depth_unmark);
 }
 
@@ -36,6 +39,7 @@ int remove_depth_execute(Graph* host_graph)
    remove_depth_pot = makeMorphismPot();
    emptyPot(remove_depth_pot);
    M_remove_depth_removeDepth = makeMorphism(1, 0, 4);
+   M_remove_depth_removeDepth2 = makeMorphism(1, 0, 4);
    M_remove_depth_unmark = makeMorphism(1, 0, 1);
 
    /* Loop Statement */
@@ -45,6 +49,21 @@ int remove_depth_execute(Graph* host_graph)
       if(matchremove_depth_removeDepth(M_remove_depth_removeDepth))
       {
          applyremove_depth_removeDepth(M_remove_depth_removeDepth, false);
+         remove_depth_success = true;
+      }
+      else
+      {
+         remove_depth_success = false;
+      }
+   }
+   remove_depth_success = true;
+   /* Loop Statement */
+   while(remove_depth_success)
+   {
+      /* Rule Call */
+      if(matchremove_depth_removeDepth2(M_remove_depth_removeDepth2))
+      {
+         applyremove_depth_removeDepth2(M_remove_depth_removeDepth2, false);
          remove_depth_success = true;
       }
       else

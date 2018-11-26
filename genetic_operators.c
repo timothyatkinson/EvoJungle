@@ -310,6 +310,30 @@ Graph* local_edge_crossover(Graph* p1, Graph* p2, int max_depth){
   return child;
 }
 
+// Graph* local_edge_crossover_fast(Graph* p1, Graph* p2, int max_depth){
+//
+//   makeDepth(p1);
+//   makeDepth(p2);
+//
+//   //Pick crossover point 1.
+//   int edge = rand_int(0, p1->number_of_edges);
+//
+//   //Find crossover point 1.
+//   Edge* e;
+//   int up_to = 0;
+//   for(int i = 0; i < p1->edges.size; i++){
+//     Edge* e2 = getEdge(p1, i);
+//     if(e2 == NULL) continue;
+//     up_to++;
+//     if(up_to == edge){
+//       e = e2;
+//     }
+//   }
+//
+//   Node* source = getNode(p1, e->source);
+//   int source_depth_down = asd
+// }
+
 Graph* local_node_crossover(Graph* p1, Graph* p2, int max_depth){
   make_depth(p1);
   make_depth(p2);

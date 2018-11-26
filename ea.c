@@ -75,7 +75,6 @@ double tournament_elitism(GP_Dataset* train_data, GP_Dataset* val_data, GP_Datas
             int p2 = tournament(scores, pop_size, tournament_size);
             new_pop[i] = local_edge_crossover(population[p1], population[p2], max_depth);
             strip_neutral(new_pop[i], max_neutral);
-            new_scores[i] = gp_evaluate_mse(new_pop[i], train_data, fset);
           }
           else{
             int p1;
@@ -130,7 +129,7 @@ double tournament_elitism(GP_Dataset* train_data, GP_Dataset* val_data, GP_Datas
       //Print
       if(generation%10 == 0 || generation + 1 == generations){
         char c = '\n';
-        if(generations > 1250){
+        if(generations > 1350){
           c = '\r';
         }
         printf("Generation %d: %d individuals. Elite score %lf, Best score %lf%c", generation, pop_size, elite_score, best_score, c);
