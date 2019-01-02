@@ -30,4 +30,6 @@ int random_integer(int min, int max);
 
 int binomial(int n, double p);
 
+int* random_order(int entries);
+
 #endif

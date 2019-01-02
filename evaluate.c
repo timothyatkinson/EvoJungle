@@ -40,13 +40,15 @@ GP_Dataset* load_dataset(char* file, int inputs, int rand_inputs, double rand_mi
 //Loads a tsv dataset from the Datasets folder.
 GP_Dataset* load_sr_dataset(char* file, int inputs, int rows, int output_skip){
   GP_Dataset* dataset = malloc(sizeof(GP_Dataset));
-  dataset->inputs = inputs + 18;
+  //dataset->inputs = inputs + 18;
+  int in = 18;
+  dataset->inputs = inputs + in;
   int outputs = 1;
   dataset->outputs = outputs;
   dataset->rows = rows;
   dataset->data = malloc(rows * sizeof(double*));
   for(int i = 0; i < rows; i++){
-    dataset->data[i] = malloc((inputs + 18 + outputs) * sizeof(double));
+    dataset->data[i] = malloc((inputs + in + outputs) * sizeof(double));
   }
   FILE* fp = fopen(file, "r");
   if(fp == NULL){
@@ -55,15 +57,23 @@ GP_Dataset* load_sr_dataset(char* file, int inputs, int rows, int output_skip){
   }
   fscanf(fp, "%*[^\n]\n", NULL);
 
-  for(int j = 0; j < 9; j++){
-    for (int i = 0; i < rows; i++){
-      dataset->data[i][j] = -0.9 + ((double)j / 10.0);
+  if(in == 1){
+
+    for(int i = 0; i < rows; i++){
+      dataset->data[i][0] = 0.1;
     }
   }
+  else{
+    for(int j = 0; j < 9; j++){
+      for (int i = 0; i < rows; i++){
+        dataset->data[i][j] = -0.9 + ((double)j / 10.0);
+      }
+    }
 
-  for(int j = 9; j < 18; j++){
-    for (int i = 0; i < rows; i++){
-      dataset->data[i][j] = 0.1 + ((double)(j - 9) / 10.0);
+    for(int j = 9; j < 18; j++){
+      for (int i = 0; i < rows; i++){
+        dataset->data[i][j] = 0.1 + ((double)(j - 9) / 10.0);
+      }
     }
   }
 
@@ -75,7 +85,7 @@ GP_Dataset* load_sr_dataset(char* file, int inputs, int rows, int output_skip){
           double x;
           fscanf(fp," %lf\t", &x);
         }
-        int r = fscanf(fp," %lf\t",&dataset->data[i][j + 18]);
+        int r = fscanf(fp," %lf\t",&dataset->data[i][j + in]);
         if(rows != 50000){
           for(int k = 0; k < 2 - output_skip; k++){
             double x;
@@ -84,12 +94,209 @@ GP_Dataset* load_sr_dataset(char* file, int inputs, int rows, int output_skip){
         }
       }
       else{
-        int r = fscanf(fp," %lf\t",&dataset->data[i][j + 18]);
+        int r = fscanf(fp," %lf\t",&dataset->data[i][j + in]);
       }
     }
   }
   fclose(fp);
   return dataset;
+}
+//
+// GP_Dataset** load_all_datasets(char* file, int inputs, int output_skip){
+//   GP_Dataset* train_dataset = malloc(sizeof(GP_Dataset));
+//   GP_Dataset* validation_dataset = malloc(sizeof(GP_Dataset));
+//   GP_Dataset* test_dataset = malloc(sizeof(GP_Dataset));
+//   //dataset->inputs = inputs + 18;
+//   int in = 18;
+//   train_dataset->inputs = inputs + in;
+//   validation_dataset->inputs = inputs + in;
+//   test_dataset->inputs = inputs + in;
+//   int outputs = 1;
+//   train_dataset->outputs = outputs;
+//   validation_dataset->outputs = outputs;
+//   test_dataset->outputs = outputs;
+//   train_dataset->rows = 35000;
+//   validation_dataset->rows = 5000;
+//   test_dataset->rows = 10000;
+//   train_dataset->data = malloc(35000 * sizeof(double*));
+//   for(int i = 0; i < 35000; i++){
+//     train_dataset->data[i] = malloc((inputs + in + outputs) * sizeof(double));
+//   }
+//   validation_dataset->data = malloc(5000 * sizeof(double*));
+//   for(int i = 0; i < 5000; i++){
+//     validation_dataset->data[i] = malloc((inputs + in + outputs) * sizeof(double));
+//   }
+//   test_dataset->data = malloc(10000 * sizeof(double*));
+//   for(int i = 0; i < 10000; i++){
+//     test_dataset->data[i] = malloc((inputs + in + outputs) * sizeof(double));
+//   }
+//   FILE* fp = fopen(file, "r");
+//   if(fp == NULL){
+//       printf("Error: file %s cannot be found.\n", file);
+//       exit(0);
+//   }
+//   fscanf(fp, "%*[^\n]\n", NULL);
+//
+//   for(int j = 0; j < 9; j++){
+//     for (int i = 0; i < 35000; i++){
+//       train_dataset->data[i][j] = -0.9 + ((double)j / 10.0);
+//     }
+//     for (int i = 0; i < 5000; i++){
+//       validation_dataset->data[i][j] = -0.9 + ((double)j / 10.0);
+//     }
+//     for (int i = 0; i < 10000; i++){
+//       test_dataset->data[i][j] = -0.9 + ((double)j / 10.0);
+//     }
+//   }
+//
+//   for(int j = 9; j < 18; j++){
+//     for (int i = 0; i < 35000; i++){
+//       train_dataset->data[i][j] = 0.1 + ((double)(j - 9) / 10.0);
+//     }
+//     for (int i = 0; i < 5000; i++){
+//       validation_dataset->data[i][j] = 0.1 + ((double)(j - 9) / 10.0);
+//     }
+//     for (int i = 0; i < 10000; i++){
+//       test_dataset->data[i][j] = 0.1 + ((double)(j - 9) / 10.0);
+//     }
+//   }
+//
+//   for (int i = 0; i < 50000; i++){
+//     for(int j = 0; j < (inputs + 1); j++){
+//       int r;
+//       if(j >= inputs){
+//         for(int k = 0; k < output_skip; k++){
+//           double x;
+//           fscanf(fp," %lf\t", &x);
+//         }
+//         if(i < 35000){
+//           int r = fscanf(fp," %lf\t",&train_dataset->data[i][j + in]);
+//         }
+//         else if (i < 40000){
+//           int r = fscanf(fp," %lf\t",&validation_dataset->data[i - 35000][j + in]);
+//         }
+//         else{
+//           int r = fscanf(fp," %lf\t",&test_dataset->data[i - 40000][j + in]);
+//         }
+//       }
+//       else{
+//         if(i < 35000){
+//           int r = fscanf(fp," %lf\t",&train_dataset->data[i][j + in]);
+//         }
+//         else if (i < 40000){
+//           int r = fscanf(fp," %lf\t",&validation_dataset->data[i - 35000][j + in]);
+//         }
+//         else{
+//           int r = fscanf(fp," %lf\t",&test_dataset->data[i - 40000][j + in]);
+//         }
+//       }
+//     }
+//   }
+//   fclose(fp);
+//   GP_Dataset** datasets = malloc(3 * sizeof(GP_Dataset*));
+//   datasets[0] = train_dataset;
+//   datasets[1] = validation_dataset;
+//   datasets[2] = test_dataset;
+//   return datasets;
+// }
+
+
+GP_Dataset** load_all_datasets(char* file, int inputs, int output_skip){
+  GP_Dataset* train_dataset = malloc(sizeof(GP_Dataset));
+  GP_Dataset* validation_dataset = malloc(sizeof(GP_Dataset));
+  GP_Dataset* test_dataset = malloc(sizeof(GP_Dataset));
+  //dataset->inputs = inputs + 18;
+  int in = 18;
+  train_dataset->inputs = inputs + in;
+  validation_dataset->inputs = inputs + in;
+  test_dataset->inputs = inputs + in;
+  int outputs = 1;
+  train_dataset->outputs = outputs;
+  validation_dataset->outputs = outputs;
+  test_dataset->outputs = outputs;
+  train_dataset->rows = 5000;
+  validation_dataset->rows = 10000;
+  test_dataset->rows = 40000;
+  train_dataset->data = malloc(5000 * sizeof(double*));
+  for(int i = 0; i < 5000; i++){
+    train_dataset->data[i] = malloc((inputs + in + outputs) * sizeof(double));
+  }
+  validation_dataset->data = malloc(10000 * sizeof(double*));
+  for(int i = 0; i < 10000; i++){
+    validation_dataset->data[i] = malloc((inputs + in + outputs) * sizeof(double));
+  }
+  test_dataset->data = malloc(40000 * sizeof(double*));
+  for(int i = 0; i < 40000; i++){
+    test_dataset->data[i] = malloc((inputs + in + outputs) * sizeof(double));
+  }
+  FILE* fp = fopen(file, "r");
+  if(fp == NULL){
+      printf("Error: file %s cannot be found.\n", file);
+      exit(0);
+  }
+  fscanf(fp, "%*[^\n]\n", NULL);
+
+  for(int j = 0; j < 9; j++){
+    for (int i = 0; i < 5000; i++){
+      train_dataset->data[i][j] = -0.9 + ((double)j / 10.0);
+    }
+    for (int i = 0; i < 10000; i++){
+      validation_dataset->data[i][j] = -0.9 + ((double)j / 10.0);
+    }
+    for (int i = 0; i < 40000; i++){
+      test_dataset->data[i][j] = -0.9 + ((double)j / 10.0);
+    }
+  }
+
+  for(int j = 9; j < 18; j++){
+    for (int i = 0; i < 5000; i++){
+      train_dataset->data[i][j] = 0.1 + ((double)(j - 9) / 10.0);
+    }
+    for (int i = 0; i < 10000; i++){
+      validation_dataset->data[i][j] = 0.1 + ((double)(j - 9) / 10.0);
+    }
+    for (int i = 0; i < 40000; i++){
+      test_dataset->data[i][j] = 0.1 + ((double)(j - 9) / 10.0);
+    }
+  }
+
+  for (int i = 0; i < 50000; i++){
+    for(int j = 0; j < (inputs + 1); j++){
+      int r;
+      if(j >= inputs){
+        for(int k = 0; k < output_skip; k++){
+          double x;
+          fscanf(fp," %lf\t", &x);
+        }
+        if(i < 0){
+          int r = fscanf(fp," %lf\t",&train_dataset->data[i][j + in]);
+        }
+        else if (i < 10000){
+          int r = fscanf(fp," %lf\t",&validation_dataset->data[i][j + in]);
+        }
+        else{
+          int r = fscanf(fp," %lf\t",&test_dataset->data[i - 10000][j + in]);
+        }
+      }
+      else{
+        if(i < 0){
+          int r = fscanf(fp," %lf\t",&train_dataset->data[i][j + in]);
+        }
+        else if (i < 10000){
+          int r = fscanf(fp," %lf\t",&validation_dataset->data[i][j + in]);
+        }
+        else{
+          int r = fscanf(fp," %lf\t",&test_dataset->data[i - 10000][j + in]);
+        }
+      }
+    }
+  }
+  fclose(fp);
+  GP_Dataset** datasets = malloc(3 * sizeof(GP_Dataset*));
+  datasets[0] = train_dataset;
+  datasets[1] = validation_dataset;
+  datasets[2] = test_dataset;
+  return datasets;
 }
 
 void free_dataset(GP_Dataset* dataset){
@@ -301,6 +508,11 @@ double gp_evaluate_square(Graph* host_graph, GP_Dataset* dataset, Function_Set* 
   int head = 0;
   int tail = 0;
 
+  int* visited = malloc(host_graph->nodes.size * sizeof(int));
+  for(int i = 0; i < host_graph->nodes.size; i++){
+    visited[i] = 0;
+  }
+
 	for(int x = 0; x < width; x++){
       ready[x] = 0;
 	}
@@ -340,6 +552,7 @@ double gp_evaluate_square(Graph* host_graph, GP_Dataset* dataset, Function_Set* 
 
   while(head < tail){
     int node_index = queue[head];
+    visited[node_index] = 1;
     head++;
     Node *host_node = getNode(host_graph, node_index);
 
@@ -402,13 +615,17 @@ double gp_evaluate_square(Graph* host_graph, GP_Dataset* dataset, Function_Set* 
   }
 
   if(outputs_found < outputs){
-    printf("Error!\n");
+    printf("Error w.r.t outputs!\n");
     printfGraph(host_graph);
     exit(0);
   }
 
   for(int o = 0; o < outputs; o++){
 		for(int r = 0; r < rows; r++){
+      if(visited[outputIndex[o]] == 0){
+        printf("Output exception:\n");
+        printfGraph(host_graph);
+      }
 			//printf("Expected %lf got %lf diff %lf\n", data[r][inputs + o], values[r][outputIndex[o]], fabs(values[r][outputIndex[o]] - data[r][inputs + o]));
     	totalError = totalError + pow(fabs(values[r][outputIndex[o]] - dataset->data[r][inputs + o]), 2);
 		}
@@ -417,6 +634,7 @@ double gp_evaluate_square(Graph* host_graph, GP_Dataset* dataset, Function_Set* 
     free(values[r]);
   }
   free(values);
+  free(visited);
 	unmark_graph(host_graph);
   return totalError;
 }

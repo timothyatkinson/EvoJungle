@@ -90,14 +90,20 @@ int main(void){
   char** d_names = dataset_names();
   int* d_inputs = dataset_inputs();
 
-  int train_entries = 700;
-  int validation_entries = 300;
+  int train_entries = 1000;
+  int validation_entries = 1000;
   int test_entries = 50000;
   int runs = 100;
 
   double** res = malloc(42 * sizeof(double*));
 
-  for(int i = 0; i < 21; i++){
+  double targ = 0.006;
+
+  for(int i = 4; i < 21; i++){
+
+    if(i == 4){
+      targ = 0.5;
+    }
 
     res[i * 2] = malloc(runs * sizeof(double));
     res[(i * 2) + 1] = malloc(runs * sizeof(double));
@@ -110,8 +116,8 @@ int main(void){
     strcpy(validation, d_names[i]);
     strcpy(test, d_names[i]);
     strcpy(out, d_names[i]);
-    strcat(train, "TrainingT1000V30.txt");
-    strcat(validation, "ValidationT1000V30.txt");
+    strcat(train, "TrainingT1000V0.txt");
+    strcat(validation, "TrainingT1000V0.txt");
     strcat(test, "Test.txt");
     strcat(out, "Results.csv");
     out[0] = 'R';
@@ -140,17 +146,28 @@ int main(void){
 
     printf("Running - No Noise (SP)\n");
     for(int j = 0; j < runs; j++){
+      //Reset random seed.
+      srand(time(NULL));
       printf("Run %d\n", j);
-      double test_mse = tournament_elitism(train_d, validation_d, test_d, fset, 100, 10, 50, 0.5, 0.04, 20, 4, 1310);
-      printf("Final test MSE = %.10e\n", test_mse);
+      double test_mse = tournament_elitism(train_d, validation_d, test_d, fset, 200, 10, 100, 0.5, 2.0, 30, 4, 843, 500);
+      int count = 0;
       res[2 * i][j] = test_mse;
       this_res[0][j] = res[2 * i][j];
+      for(int k = 0; k <= j; k++){
+        if(this_res[0][k] < targ){
+          count++;
+        }
+      }
+      printf("Final test MSE = %.10e\n", test_mse);
+      printf("%d:%d, %lf%%\n", count, (j + 1) - count, (double)count / (double)(j + 1));
     }
 
     printf("Running - Noise\n");
     for(int j = 0; j < runs; j++){
+      //Reset random seed.
+      srand(time(NULL));
       printf("Run %d\n", j);
-      double test_mse = tournament_elitism(train_d_n, validation_d_n, test_d_n, fset, 100, 10, 50, 0.5, 0.04, 20, 4, 1310);
+      double test_mse = tournament_elitism(train_d_n, validation_d_n, test_d_n, fset, 200, 10, 100, 0.5, 2.0, 30, 4, 843, 500);
       printf("Final test MSE = %.10e\n", test_mse);
       res[(2 * i) + 1][j] = test_mse;
       this_res[1][j] = res[(2 * i) + 1][j];

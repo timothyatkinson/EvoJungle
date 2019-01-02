@@ -1,0 +1,290 @@
+Main = MarkNeutral; StripBlue; ExchangeNodes; {markGreenEdge, moveInputGreen}!; {makeGreenRed, makeBlueRed}!
+MarkNeutral = markOutputsRed!; markOutputsBlue; markActiveRed!; markActiveBlue!
+StripBlue = removeGreyOutputs!; {removeBlueNeutralNode, removeBlueNeutralEdge}!
+ExchangeNodes = (markGreenFunc; [pickDelete]; deleteEdges!; deleteNode)!
+markOutputsRed
+(
+  a : list
+)
+[
+  (n0, a:"OUT"#red)
+  |
+]
+=>
+[
+  (n0, a:"OUT"#green)
+  |
+]
+interface = {
+  n0
+}
+
+markOutputsBlue
+(
+  a : list
+)
+[
+  (n0, a:"OUT"#blue)
+  |
+]
+=>
+[
+  (n0, a:"OUT"#grey)
+  |
+]
+interface = {
+  n0
+}
+
+markActiveRed
+(
+  a, b, c : list
+)
+[
+  (n0, a#green)
+  (n1, b#red)
+  |
+  (e0, n0, n1, c#red)
+]
+=>
+[
+  (n0, a#green)
+  (n1, b#green)
+  |
+  (e0, n0, n1, c#red)
+]
+interface = {
+  n0, n1
+}
+
+markActiveBlue
+(
+  a, b, c : list
+)
+[
+  (n0, a#grey)
+  (n1, b#blue)
+  |
+  (e0, n0, n1, c#blue)
+]
+=>
+[
+  (n0, a#grey)
+  (n1, b#grey)
+  |
+  (e0, n0, n1, c#blue)
+]
+interface = {
+  n0, n1
+}
+
+removeGreyOutputs
+(
+  a, b, c : list
+)
+[
+  (n0, a:"OUT"#grey)
+  (n1, b#grey)
+  |
+  (e0, n0, n1, c#blue)
+]
+=>
+[
+  (n1, b#grey)
+  |
+]
+interface = {
+  n1
+}
+
+removeBlueNeutralNode
+(
+  a : list
+)
+[
+  (n0, a#blue)
+  |
+]
+=>
+[
+  |
+]
+interface = {}
+
+removeBlueNeutralEdge
+(
+  a, b, c : list
+)
+[
+  (n0, a#blue)
+  (n1, b#any)
+  |
+  (e0, n0, n1, c#any)
+]
+=>
+[
+  (n0, a#blue)
+  (n1, b#any)
+  |
+]
+interface = {
+  n0, n1
+}
+
+markGreenFunc
+(
+  a : list;
+  s : string
+)
+[
+  (n1, a : s # grey)
+  |
+]
+=>
+[
+  (n1, a : s # green)
+  |
+]
+interface = {
+  n1
+}
+where s != "IN"
+
+
+pickDelete
+(
+  a : list;
+  s : string
+)
+[
+  (n0, a : s#red)
+  |
+]
+=>
+[
+  (n0, a : s#blue)
+  |
+]
+interface = {
+  n0
+}
+where indeg(n0) = 0 and s != "IN"
+
+deleteEdges
+(
+  a, b, c : list
+)
+[
+  (n0, a#blue)
+  (n1, b#any)
+  |
+  (e0, n0, n1, c#any)
+]
+=>
+[
+  (n0, a#blue)
+  (n1, b#any)
+  |
+]
+interface = {
+  n0, n1
+}
+
+deleteNode
+(
+  a : list
+)
+[
+  (n0, a#blue)
+  |
+]
+=>
+[
+  |
+]
+interface = {
+}
+
+markGreenEdge
+(
+  a, b, c : list
+)
+[
+  (n0, a # green)
+  (n1, b # any)
+  |
+  (e0, n0, n1, c #blue)
+]
+=>
+[
+  (n0, a # green)
+  (n1, b # any)
+  |
+  (e0, n0, n1, c #red)
+]
+interface = {
+  n0, n1
+}
+
+moveInputGreen
+(
+  a, b, c, d : list;
+  x, y : int
+)
+[
+  (n0, a #green)
+  (n1, x : b : "IN" #grey)
+  (n2, y : c : "IN" #any)
+  |
+  (e0, n0, n1, d # red)
+]
+=>
+[
+  (n0, a #green)
+  (n1, x : b : "IN" #grey)
+  (n2, y : c : "IN" #any)
+  |
+  (e0, n0, n2, d # red)
+]
+interface = {
+  n0, n1, n2
+}
+where x = y
+
+makeGreenRed
+(
+  a : list
+)
+[
+  (n0, a#green)
+  |
+]
+=>
+[
+  (n0, a#red)
+  |
+]
+interface = {
+  n0
+}
+
+makeBlueRed
+(
+  a, b, c : list
+)
+[
+  (n0, a#red)
+  (n1, b#red)
+  |
+  (e0, n0, n1, c#blue)
+]
+=>
+[
+  (n0, a#red)
+  (n1, b#red)
+  |
+  (e0, n0, n1, c#red)
+]
+interface = {
+  n0, n1
+}

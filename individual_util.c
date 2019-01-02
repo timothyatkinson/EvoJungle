@@ -2,7 +2,7 @@
 #include "GP2_Files/depth_start/depth_start.h"
 
 Graph* disjoint_union(Graph* red, Graph* blue){
-  Graph *graph_copy = newGraph(150, 300);
+  Graph *graph_copy = newGraph(200, 500);
   int node_mapping_red[red->nodes.size];
   int node_mapping_blue[blue->nodes.size];
   //Copy nodes
@@ -65,7 +65,7 @@ Graph* get_mark(Graph* multi_mark, int mark, int target_mark){
 //Graph duplication function
 Graph* duplicate_graph(Graph *graph)
 {
-   Graph *graph_copy = newGraph(150, 300);
+   Graph *graph_copy = newGraph(200, 500);
 	 int node_mapping[graph->nodes.size];
 	 //Copy nodes
 	 for(int i = 0; i < graph->nodes.size; i++){
@@ -91,15 +91,14 @@ int count_active_nodes(Graph* hostG, int inputs, int outputs){
 		 Node *host_node = getNode(hostG, host_index);
 		 if(host_node == NULL || host_node->index == -1) continue;
 		 HostLabel label = host_node->label;
-		 if(label.mark > 0){
+		 HostListItem *item = label.list->last;
+		 if(item->atom.type != 's') break;
+		 if(label.mark > 0 && !(strcmp(item->atom.str, "IN") == 0 || strcmp(item->atom.str, "OUT") == 0)){
 		 	count++;
 		 }
 	}
 	unmark_graph(hostG);
-	if(count < (inputs + outputs)){
-		return 0;
-	}
-	return count - (inputs + outputs);
+	return count;
 }
 
 //Counts the active nodes in a GP individual.
@@ -245,6 +244,9 @@ void make_depth(Graph* graph){
     if(item->atom.type != 's') break;
     if(strcmp(item->atom.str, "OUT") == 0){
       depthDown[i] = 0;
+    }
+    if(strcmp(item->atom.str, "IN") == 0){
+      depthUp[i] = 0;
     }
   }
 
@@ -415,6 +417,40 @@ int* topological_sort(Graph* host){
   free(ready);
   free(queue);
   return order;
+}
+
+int count_inputs(Graph* hostG){
+  int inputs = 0;
+	for(int host_index = 0; host_index < hostG->nodes.size; host_index++)
+	{
+		 Node *host_node = getNode(hostG, host_index);
+		 if(host_node == NULL || host_node->index == -1) continue;
+
+		 HostLabel label = host_node->label;
+		 HostListItem *item = label.list->last;
+		 if(item->atom.type != 's') break;
+		 if(strcmp(item->atom.str, "IN") == 0){
+       inputs ++;
+		 }
+	}
+  return inputs;
+}
+
+int count_outputs(Graph* hostG){
+  int outputs = 0;
+	for(int host_index = 0; host_index < hostG->nodes.size; host_index++)
+	{
+		 Node *host_node = getNode(hostG, host_index);
+		 if(host_node == NULL || host_node->index == -1) continue;
+
+		 HostLabel label = host_node->label;
+		 HostListItem *item = label.list->last;
+		 if(item->atom.type != 's') break;
+		 if(strcmp(item->atom.str, "OUT") == 0){
+       outputs ++;
+		 }
+	}
+  return outputs;
 }
 
 //Performs a reverse topological sort in O(v + e) time. Uses the topological_sort function and then reverses the result.

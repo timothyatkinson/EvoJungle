@@ -34,6 +34,41 @@ interface = {
   n0
 }
 
+markRedGreen
+(
+  a : list
+)
+[
+  (n0, a#red)
+  |
+]
+=>
+[
+  (n0, a#green)
+  |
+]
+interface = {
+  n0
+}
+
+
+markBlueGrey
+(
+  a : list
+)
+[
+  (n0, a#blue)
+  |
+]
+=>
+[
+  (n0, a#grey)
+  |
+]
+interface = {
+  n0
+}
+
 markActiveRed
 (
   a, b, c : list

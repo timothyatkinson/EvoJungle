@@ -2,7 +2,7 @@
 
 //Code for generating the first individual
 Main = GenerateIndividual
-GenerateIndividual = initNodeCounter; AddNode!; [connectOutput]!; removeDepth!; decolourNode!; deleteNodeCounter
+GenerateIndividual = initNodeCounter; AddNode!; [connectOutput2]!; removeDepth!; decolourNode!; deleteNodeCounter
 AddNode = [addNode]; [addEdgeToArity]!; updateDepth!; decolourNode
 
 // INIT NODE COUNTER - Creates a counter for adding nodes
@@ -144,24 +144,56 @@ interface =
 connectOutput
 (
 	a, b : list;
-	s : string
+	s : string;
+	y, d : int
 )
 [1.0]
 [
 	(n0, a:"OUT")
-	(n1, b:s)
+	(n1, b:y:s)
+	(d0(R), "Depth":d)
 	|
 ]
 =>
 [
 	(n0, a:"OUT")
-	(n1, b:s)
+	(n1, b:y:s)
+	(d0(R), "Depth":d)
 	|
 	(e0, n0, n1, 0)
 ]
 interface =
 {
-	n0, n1
+	n0, n1, d0
+}
+where s !="OUT" and outdeg(n0) < 1 and y = d
+
+
+// CONNECT OUTPUT - CONNECT OUTPUT
+connectOutput2
+(
+	a, b : list;
+	s : string;
+	y, d : int
+)
+[1.0]
+[
+	(n0, a:"OUT")
+	(n1, b:y:s)
+	(d0(R), "Depth":d)
+	|
+]
+=>
+[
+	(n0, a:"OUT")
+	(n1, b:y:s)
+	(d0(R), "Depth":d)
+	|
+	(e0, n0, n1, 0)
+]
+interface =
+{
+	n0, n1, d0
 }
 where s !="OUT" and outdeg(n0) < 1
 

@@ -10,6 +10,10 @@
 Morphism *M_local_edge_crossover_markOutputsRed = NULL;
 #include "local_edge_crossover_markOutputsBlue.h"
 Morphism *M_local_edge_crossover_markOutputsBlue = NULL;
+#include "local_edge_crossover_markRedGreen.h"
+Morphism *M_local_edge_crossover_markRedGreen = NULL;
+#include "local_edge_crossover_markBlueGrey.h"
+Morphism *M_local_edge_crossover_markBlueGrey = NULL;
 #include "local_edge_crossover_markActiveRed.h"
 Morphism *M_local_edge_crossover_markActiveRed = NULL;
 #include "local_edge_crossover_markActiveBlue.h"
@@ -37,6 +41,8 @@ static void local_edge_crossover_freeMorphisms(void)
 {
    freeMorphism(M_local_edge_crossover_markOutputsRed);
    freeMorphism(M_local_edge_crossover_markOutputsBlue);
+   freeMorphism(M_local_edge_crossover_markRedGreen);
+   freeMorphism(M_local_edge_crossover_markBlueGrey);
    freeMorphism(M_local_edge_crossover_markActiveRed);
    freeMorphism(M_local_edge_crossover_markActiveBlue);
    freeMorphism(M_local_edge_crossover_crossover_point);
@@ -70,6 +76,8 @@ int local_edge_crossover_execute(Graph* host_graph)
    emptyPot(local_edge_crossover_pot);
    M_local_edge_crossover_markOutputsRed = makeMorphism(1, 0, 1);
    M_local_edge_crossover_markOutputsBlue = makeMorphism(1, 0, 1);
+   M_local_edge_crossover_markRedGreen = makeMorphism(1, 0, 1);
+   M_local_edge_crossover_markBlueGrey = makeMorphism(1, 0, 1);
    M_local_edge_crossover_markActiveRed = makeMorphism(2, 1, 3);
    M_local_edge_crossover_markActiveBlue = makeMorphism(2, 1, 3);
    M_local_edge_crossover_crossover_point = makeMorphism(5, 2, 13);

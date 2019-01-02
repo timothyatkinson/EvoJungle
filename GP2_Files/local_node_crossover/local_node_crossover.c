@@ -10,12 +10,20 @@
 Morphism *M_local_node_crossover_markOutputsRed = NULL;
 #include "local_node_crossover_markOutputsBlue.h"
 Morphism *M_local_node_crossover_markOutputsBlue = NULL;
+#include "local_node_crossover_markRedGreen.h"
+Morphism *M_local_node_crossover_markRedGreen = NULL;
+#include "local_node_crossover_markBlueGrey.h"
+Morphism *M_local_node_crossover_markBlueGrey = NULL;
 #include "local_node_crossover_markActiveRed.h"
 Morphism *M_local_node_crossover_markActiveRed = NULL;
 #include "local_node_crossover_markActiveBlue.h"
 Morphism *M_local_node_crossover_markActiveBlue = NULL;
 #include "local_node_crossover_crossover_point.h"
 Morphism *M_local_node_crossover_crossover_point = NULL;
+#include "local_node_crossover_crossover_point1.h"
+Morphism *M_local_node_crossover_crossover_point1 = NULL;
+#include "local_node_crossover_crossover_point2.h"
+Morphism *M_local_node_crossover_crossover_point2 = NULL;
 #include "local_node_crossover_markGreenFunc.h"
 Morphism *M_local_node_crossover_markGreenFunc = NULL;
 #include "local_node_crossover_markGreenEdge.h"
@@ -33,9 +41,13 @@ static void local_node_crossover_freeMorphisms(void)
 {
    freeMorphism(M_local_node_crossover_markOutputsRed);
    freeMorphism(M_local_node_crossover_markOutputsBlue);
+   freeMorphism(M_local_node_crossover_markRedGreen);
+   freeMorphism(M_local_node_crossover_markBlueGrey);
    freeMorphism(M_local_node_crossover_markActiveRed);
    freeMorphism(M_local_node_crossover_markActiveBlue);
    freeMorphism(M_local_node_crossover_crossover_point);
+   freeMorphism(M_local_node_crossover_crossover_point1);
+   freeMorphism(M_local_node_crossover_crossover_point2);
    freeMorphism(M_local_node_crossover_markGreenFunc);
    freeMorphism(M_local_node_crossover_markGreenEdge);
    freeMorphism(M_local_node_crossover_moveInputGreen);
@@ -64,9 +76,13 @@ int local_node_crossover_execute(Graph* host_graph)
    emptyPot(local_node_crossover_pot);
    M_local_node_crossover_markOutputsRed = makeMorphism(1, 0, 1);
    M_local_node_crossover_markOutputsBlue = makeMorphism(1, 0, 1);
+   M_local_node_crossover_markRedGreen = makeMorphism(1, 0, 1);
+   M_local_node_crossover_markBlueGrey = makeMorphism(1, 0, 1);
    M_local_node_crossover_markActiveRed = makeMorphism(2, 1, 3);
    M_local_node_crossover_markActiveBlue = makeMorphism(2, 1, 3);
    M_local_node_crossover_crossover_point = makeMorphism(5, 2, 13);
+   M_local_node_crossover_crossover_point1 = makeMorphism(2, 1, 3);
+   M_local_node_crossover_crossover_point2 = makeMorphism(5, 2, 13);
    M_local_node_crossover_markGreenFunc = makeMorphism(2, 1, 4);
    M_local_node_crossover_markGreenEdge = makeMorphism(2, 1, 3);
    M_local_node_crossover_moveInputGreen = makeMorphism(3, 1, 6);

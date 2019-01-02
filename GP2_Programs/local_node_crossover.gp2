@@ -34,6 +34,41 @@ interface = {
   n0
 }
 
+markRedGreen
+(
+  a : list
+)
+[
+  (n0, a#red)
+  |
+]
+=>
+[
+  (n0, a#green)
+  |
+]
+interface = {
+  n0
+}
+
+
+markBlueGrey
+(
+  a : list
+)
+[
+  (n0, a#blue)
+  |
+]
+=>
+[
+  (n0, a#grey)
+  |
+]
+interface = {
+  n0
+}
+
 markActiveRed
 (
   a, b, c : list
@@ -91,6 +126,60 @@ crossover_point
   (n4(R), "Depth":m)
   |
   (e0, n0, n1, e #red)
+  (e1, n2, n3, f #blue)
+]
+=>
+[
+  (n0, a  : w : x : s#green)
+  (n1, b #green)
+  (n2, c #grey)
+  (n3, d : y : z : t#grey)
+  (n4(R), "Depth":m)
+  |
+  (e0, n0, n3, e #red)
+  (e1, n2, n1, f #blue)
+]
+interface = {
+  n0, n1, n2, n3
+}
+where x + y <= m
+
+crossover_point1
+(
+  a, b, c : list
+)
+[
+  (n0, a#green)
+  (n1, b#green)
+  |
+  (e0, n0, n1, c#red)
+]
+=>
+[
+  (n0(R), a#green)
+  (n1(R), b#green)
+  |
+  (e0, n0, n1, c:"CROSS"#red)
+]
+interface = {
+  n0, n1
+}
+
+crossover_point2
+(
+  a, b, c, d, e, f : list;
+  w, x, y, z, m : int;
+  s, t : string
+)
+[1.0]
+[
+  (n0(R), a  : w : x : s#green)
+  (n1(R), b #green)
+  (n2, c #grey)
+  (n3, d : y : z : t#grey)
+  (n4(R), "Depth":m)
+  |
+  (e0, n0, n1, e:"CROSS" #red)
   (e1, n2, n3, f #blue)
 ]
 =>

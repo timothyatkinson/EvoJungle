@@ -43,6 +43,9 @@ int depth(Graph* graph);
 void make_depth(Graph* graph);
 void print_prepare(Graph* hostG);
 
+int count_inputs(Graph* graph);
+int count_outputs(Graph* graph);
+
 //Performs a topological sort on a graph in O(v + e) time.
 int* topological_sort(Graph* host);
 //Performs a reverse topological sort in O(v + e) time. Uses the topological_sort function and then reverses the result.

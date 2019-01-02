@@ -1,4 +1,7 @@
 #include "rand_util.h"
+#include "stdlib.h"
+
+
 
 /**random_double - random double
   *Computes a randomom double between 0 and 1 using C's inbuilt RNG
@@ -48,4 +51,19 @@ int binomial(int n, double p){
     }
   }
   return x;
+}
+
+int* random_order(int entries){
+  int* order = malloc(entries * sizeof(int));
+  for(int i = 0; i < entries; i++){
+    order[i] = i;
+  }
+
+  for(int i = 0; i < entries; i++){
+    int j = random_integer(0, i + 1);
+    int x = order[i];
+    order[i] = order[j];
+    order[j] = x;
+  }
+  return order;
 }

@@ -3,8 +3,8 @@ INCDIR= $(PGP2DIR)/include/
 LIBDIR= $(PGP2DIR)/lib/
 GP2_PROGRAMS = GP2_Programs
 GP2_FILES = GP2_Files
-GP2_OBJECTS = depth_start init_individual local_edge_crossover local_node_crossover mutate_edge mutate_node remove_depth neutral_cap
-OBJECTS := evaluate.c function_set.c genetic_operators.c individual_util.c ea.c rand_util.c
+GP2_OBJECTS = depth_start init_individual local_edge_crossover local_node_crossover mutate_edge mutate_node remove_depth neutral_cap horizontal
+OBJECTS := evaluate.c function_set.c genetic_operators.c individual_util.c ea.c rand_util.c horizontal_ea.c
 CC=gcc
 
 CFLAGS = -I$(INCDIR) -L $(LIBDIR) -O2 -lgp2 -lm -g -fsplit-stack
@@ -32,3 +32,28 @@ symreg_sp:	$(OBJECTS) symbolic_regression_small_pop.c
 
 symreg-clean_sp:
 		rm -f symreg_sp
+
+microbial:	$(OBJECTS) microbial.c
+		rm -f -r $(GP2_FILES);	mkdir $(GP2_FILES);
+		$(foreach var,$(GP2_OBJECTS),mkdir $(GP2_FILES)/$(var);	echo '$(var) compile'; $(PGP2DIR)/bin/gp2 -l $(PGP2DIR) -m $(var) -o $(GP2_FILES)/$(var) $(GP2_PROGRAMS)/$(var).gp2; )
+		$(CC) microbial.c $(OBJECTS) $(foreach var,$(GP2_OBJECTS), $(GP2_FILES)/$(var)/*.c) $(CFLAGS) -o microbial
+
+microbial-clean:
+		rm -f microbial
+
+
+nl:	$(OBJECTS) n_times_l.c
+		rm -f -r $(GP2_FILES);	mkdir $(GP2_FILES);
+		$(foreach var,$(GP2_OBJECTS),mkdir $(GP2_FILES)/$(var);	echo '$(var) compile'; $(PGP2DIR)/bin/gp2 -l $(PGP2DIR) -m $(var) -o $(GP2_FILES)/$(var) $(GP2_PROGRAMS)/$(var).gp2; )
+		$(CC) n_times_l.c $(OBJECTS) $(foreach var,$(GP2_OBJECTS), $(GP2_FILES)/$(var)/*.c) $(CFLAGS) -o nl
+
+nl-clean:
+		rm -f nl
+
+he:	$(OBJECTS) horizontal_experiment.c
+		rm -f -r $(GP2_FILES);	mkdir $(GP2_FILES);
+		$(foreach var,$(GP2_OBJECTS),mkdir $(GP2_FILES)/$(var);	echo '$(var) compile'; $(PGP2DIR)/bin/gp2 -l $(PGP2DIR) -m $(var) -o $(GP2_FILES)/$(var) $(GP2_PROGRAMS)/$(var).gp2; )
+		$(CC) horizontal_experiment.c $(OBJECTS) $(foreach var,$(GP2_OBJECTS), $(GP2_FILES)/$(var)/*.c) $(CFLAGS) -o he
+
+he-clean:
+		rm -f he

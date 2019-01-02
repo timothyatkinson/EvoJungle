@@ -90,8 +90,8 @@ int main(void){
   char** d_names = dataset_names();
   int* d_inputs = dataset_inputs();
 
-  int train_entries = 700;
-  int validation_entries = 300;
+  int train_entries = 1000;
+  int validation_entries = 1000;
   int test_entries = 50000;
   int runs = 100;
 
@@ -105,13 +105,30 @@ int main(void){
     char train[50];
     char validation[50];
     char test[50];
+    char out[50];
     strcpy(train, d_names[i]);
     strcpy(validation, d_names[i]);
     strcpy(test, d_names[i]);
-    strcat(train, "TrainingT1000V30.txt");
-    strcat(validation, "ValidationT1000V30.txt");
+    strcpy(out, d_names[i]);
+    strcat(train, "TrainingT1000V0.txt");
+    strcat(validation, "TrainingT1000V0.txt");
     strcat(test, "Test.txt");
-    printf("Running on files %s, %s, %s\n", train, validation, test);
+    strcat(out, "Results2.csv");
+    out[0] = 'R';
+    out[1] = 'e';
+    out[2] = 's';
+    out[3] = 'u';
+    out[4] = 'l';
+    out[5] = 't';
+    out[6] = 'N';
+    out[7] = 'C';
+    printf("Running on files %s, %s, %s -> %s\n", train, validation, test, out);
+
+
+    double** this_res = malloc(2 * sizeof(double*));
+    this_res[0] = malloc(runs * sizeof(double));
+    this_res[1] = malloc(runs * sizeof(double));
+
 
     printf("Loading Datasets\n");
     //No noise
@@ -125,18 +142,24 @@ int main(void){
 
     printf("Running - No Noise\n");
     for(int j = 0; j < runs; j++){
+      //Reset random seed.
+      srand(time(NULL));
       printf("Run %d\n", j);
-      double test_mse = tournament_elitism(train_d, validation_d, test_d, fset, 100, 10, 200, 0.0, 0.04, 5, 4, 6240);
+      double test_mse = tournament_elitism(train_d, validation_d, test_d, fset, 100, 10, 100, 0.0, 2.0, 5, 4, 6110, 500);
       printf("Final test MSE = %.10e\n", test_mse);
       res[2 * i][j] = test_mse;
+      this_res[0][j] = res[2 * i][j];
     }
 
     printf("Running - Noise\n");
     for(int j = 0; j < runs; j++){
+      //Reset random seed.
+      srand(time(NULL));
       printf("Run %d\n", j);
-      double test_mse = tournament_elitism(train_d_n, validation_d_n, test_d_n, fset, 100, 10, 200, 0.0, 0.04, 5, 4, 6240);
+      double test_mse = tournament_elitism(train_d_n, validation_d_n, test_d_n, fset, 100, 10, 100, 0.0, 2.0, 5, 4, 6110, 500);
       printf("Final test MSE = %.10e\n", test_mse);
       res[(2 * i) + 1][j] = test_mse;
+      this_res[1][j] = res[(2 * i) + 1][j];
     }
 
     printf("Freeing Datasets\n");
@@ -146,6 +169,8 @@ int main(void){
     free_dataset(train_d_n);
     free_dataset(validation_d_n);
     free_dataset(test_d_n);
+
+    print_to_csv_file(out, this_res, 2, runs);
   }
 
   print_to_csv_file("Results/symres_no_crossover_results.csv", res, 42, 100);

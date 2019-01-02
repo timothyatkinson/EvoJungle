@@ -32,6 +32,7 @@ typedef struct GP_Dataset {
 GP_Dataset* load_dataset(char* file, int inputs, int rand_inputs, double rand_min, double rand_max, int outputs, int rows);
 //Loads a tsv dataset from the Datasets folder.
 GP_Dataset* load_sr_dataset(char* file, int inputs, int rows, int output_skip);
+GP_Dataset** load_all_datasets(char* file, int inputs, int output_skip);
 void free_dataset(GP_Dataset* dataset);
 
 //Evaluates a computational network against a dataset

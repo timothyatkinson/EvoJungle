@@ -4,10 +4,11 @@
 
 bool init_individual_b5 = true;
 bool init_individual_b6 = true;
+bool init_individual_b7 = true;
 
 static bool evaluateCondition(void)
 {
-   return (init_individual_b5 && init_individual_b6);
+   return ((init_individual_b5 && init_individual_b6) && init_individual_b7);
 }
 
 static void evaluatePredicateinit_individual_5(Morphism *morphism)
@@ -47,18 +48,99 @@ static void evaluatePredicateinit_individual_6(Morphism *morphism)
    else init_individual_b6 = false;
 }
 
+static void evaluatePredicateinit_individual_7(Morphism *morphism)
+{
+   Assignment assignment_3 = getAssignment(morphism, 3);
+   /* If the variable is not yet assigned, return. */
+   if(assignment_3.type == 'n') return;
+   int var_3 = getIntegerValue(morphism, 3);
+
+   Assignment assignment_4 = getAssignment(morphism, 4);
+   /* If the variable is not yet assigned, return. */
+   if(assignment_4.type == 'n') return;
+   int var_4 = getIntegerValue(morphism, 4);
+
+   if(var_3 == var_4) init_individual_b7 = true;
+   else init_individual_b7 = false;
+}
+
+static bool match_n2(Morphism *morphism);
 static bool match_n0(Morphism *morphism);
 static bool match_n1(Morphism *morphism);
 
 bool matchinit_individual_connectOutput(Morphism *morphism)
 {
-   if(2 > init_individual_host->number_of_nodes || 0 > init_individual_host->number_of_edges) return false;
-   if(match_n0(morphism)) return true;
+   if(3 > init_individual_host->number_of_nodes || 0 > init_individual_host->number_of_edges) return false;
+   if(match_n2(morphism)) return true;
    else
    {
       initialiseMorphism(morphism, init_individual_host);
       return false;
    }
+}
+
+static bool match_n2(Morphism *morphism)
+{
+   RootNodes *nodes;
+   for(nodes = getRootNodeList(init_individual_host); nodes != NULL; nodes = nodes->next)
+   {
+      Node *host_node = getNode(init_individual_host, nodes->index);
+      if(host_node == NULL) continue;
+      if(host_node->matched) continue;
+      if(host_node->label.mark != 0) continue;
+      if(host_node->indegree < 0 || host_node->outdegree < 0 ||
+         ((host_node->outdegree + host_node->indegree - 0 - 0 - 0) < 0)) continue;
+
+      HostLabel label = host_node->label;
+      bool match = false;
+      /* Label Matching */
+      int new_assignments = 0;
+      do
+      {
+         /* The rule list does not contain a list variable, so there is no
+          * match if the host list has a different length. */
+         if(label.length != 2) break;
+         HostListItem *item = label.list->first;
+         /* Matching rule atom 1. */
+         if(item->atom.type != 's') break;
+         else if(strcmp(item->atom.str, "Depth") != 0) break;
+         item = item->next;
+
+         /* Matching rule atom 2. */
+         int result = -1;
+         /* Matching integer variable 4. */
+         if(item->atom.type != 'i') break;
+         result = addIntegerAssignment(morphism, 4, item->atom.num);
+         if(result >= 0)
+         {
+            new_assignments += result;
+            /* Update global booleans for the variable's predicates. */
+            evaluatePredicateinit_individual_7(morphism);
+            if(!evaluateCondition())
+            {
+               /* Reset the boolean variables in the predicates of this variable. */
+               init_individual_b7 = true;
+               break;
+            }
+         }
+         else break;
+         match = true;
+      } while(false);
+
+      if(match)
+      {
+         addNodeMap(morphism, 2, host_node->index, new_assignments);
+         host_node->matched = true;
+         if(match_n0(morphism)) return true;
+         else
+         {
+         removeNodeMap(morphism, 2);
+         host_node->matched = false;
+         }
+      }
+      else removeAssignments(morphism, new_assignments);
+   }
+   return false;
 }
 
 static bool match_n0(Morphism *morphism)
@@ -166,7 +248,7 @@ static bool match_n1(Morphism *morphism)
       int new_assignments = 0;
       do
       {
-         if(label.length < 1) break;
+         if(label.length < 2) break;
          /* Matching from the start of the host list. */
          HostListItem *item = label.list->first;
          int result = -1;
@@ -180,7 +262,7 @@ static bool match_n1(Morphism *morphism)
          /* Matching from the end of the host list. */
          /* Check if the host list has passed "start". */
          if(item == start->prev) break;
-         /* Matching rule atom 2 */
+         /* Matching rule atom 3 */
          /* Matching string variable 2. */
          if(item->atom.type != 's') break;
          result = addStringAssignment(morphism, 2, item->atom.str);
@@ -198,6 +280,26 @@ static bool match_n1(Morphism *morphism)
          }
          else break;
          item = item->prev;
+         /* Check if the host list has passed "start". */
+         if(item == start->prev) break;
+         /* Matching rule atom 2 */
+         /* Matching integer variable 3. */
+         if(item->atom.type != 'i') break;
+         result = addIntegerAssignment(morphism, 3, item->atom.num);
+         if(result >= 0)
+         {
+            new_assignments += result;
+            /* Update global booleans for the variable's predicates. */
+            evaluatePredicateinit_individual_7(morphism);
+            if(!evaluateCondition())
+            {
+               /* Reset the boolean variables in the predicates of this variable. */
+               init_individual_b7 = true;
+               break;
+            }
+         }
+         else break;
+         item = item->prev;
          /* Matching list variable 1. */
          if(item == start->prev) result = addListAssignment(morphism, 1, NULL);
          else if(item == start)
@@ -208,7 +310,7 @@ static bool match_n1(Morphism *morphism)
          else
          {
             /* Assign to variable 1 the unmatched sublist of the host list. */
-            HostAtom sublist[label.length - 1];
+            HostAtom sublist[label.length - 2];
             int list_index = 0;
             HostListItem *iterator = start;
             while(iterator != item->next)
@@ -216,7 +318,7 @@ static bool match_n1(Morphism *morphism)
                sublist[list_index++] = iterator->atom;
                iterator = iterator->next;
             }
-            HostList *list = makeHostList(sublist, label.length - 1, false);
+            HostList *list = makeHostList(sublist, label.length - 2, false);
             result = addListAssignment(morphism, 1, list);
             freeHostList(list);
          }
@@ -270,15 +372,16 @@ void applyinit_individual_connectOutput(Morphism *morphism, bool record_changes)
    initialiseMorphism(morphism, init_individual_host);
 }
 
+static bool fillpot_n2(MorphismPot *pot, Morphism *morphism);
 static bool fillpot_n0(MorphismPot *pot, Morphism *morphism);
 static bool fillpot_n1(MorphismPot *pot, Morphism *morphism);
 
 bool fillpotinit_individual_connectOutput(MorphismPot *pot, Morphism *morphism)
 {
-   if(2 > init_individual_host->number_of_nodes || 0 > init_individual_host->number_of_edges) return false;
+   if(3 > init_individual_host->number_of_nodes || 0 > init_individual_host->number_of_edges) return false;
    int oldPotsize = potSize(pot);
    morphism->weight = 1.000000;
-   fillpot_n0(pot, morphism);
+   fillpot_n2(pot, morphism);
    if(potSize(pot) > oldPotsize){
       initialiseMorphism(morphism, init_individual_host);
       return true;
@@ -288,6 +391,70 @@ bool fillpotinit_individual_connectOutput(MorphismPot *pot, Morphism *morphism)
       initialiseMorphism(morphism, init_individual_host);
       return false;
    }
+}
+
+static bool fillpot_n2(MorphismPot *pot, Morphism *morphism)
+{
+   RootNodes *nodes;
+   for(nodes = getRootNodeList(init_individual_host); nodes != NULL; nodes = nodes->next)
+   {
+      Node *host_node = getNode(init_individual_host, nodes->index);
+      if(host_node == NULL) continue;
+      if(host_node->matched) continue;
+      if(host_node->label.mark != 0) continue;
+      if(host_node->indegree < 0 || host_node->outdegree < 0 ||
+         ((host_node->outdegree + host_node->indegree - 0 - 0 - 0) < 0)) continue;
+
+      HostLabel label = host_node->label;
+      bool match = false;
+      /* Label Matching */
+      int new_assignments = 0;
+      do
+      {
+         /* The rule list does not contain a list variable, so there is no
+          * match if the host list has a different length. */
+         if(label.length != 2) break;
+         HostListItem *item = label.list->first;
+         /* Matching rule atom 1. */
+         if(item->atom.type != 's') break;
+         else if(strcmp(item->atom.str, "Depth") != 0) break;
+         item = item->next;
+
+         /* Matching rule atom 2. */
+         int result = -1;
+         /* Matching integer variable 4. */
+         if(item->atom.type != 'i') break;
+         result = addIntegerAssignment(morphism, 4, item->atom.num);
+         if(result >= 0)
+         {
+            new_assignments += result;
+            /* Update global booleans for the variable's predicates. */
+            evaluatePredicateinit_individual_7(morphism);
+            if(!evaluateCondition())
+            {
+               /* Reset the boolean variables in the predicates of this variable. */
+               init_individual_b7 = true;
+               break;
+            }
+         }
+         else break;
+         match = true;
+      } while(false);
+
+      if(match)
+      {
+         addNodeMap(morphism, 2, host_node->index, new_assignments);
+         host_node->matched = true;
+         if(fillpot_n0(pot, morphism)) return true;
+         else
+         {
+         removeNodeMap(morphism, 2);
+         host_node->matched = false;
+         }
+      }
+      else removeAssignments(morphism, new_assignments);
+   }
+   return false;
 }
 
 static bool fillpot_n0(MorphismPot *pot, Morphism *morphism)
@@ -395,7 +562,7 @@ static bool fillpot_n1(MorphismPot *pot, Morphism *morphism)
       int new_assignments = 0;
       do
       {
-         if(label.length < 1) break;
+         if(label.length < 2) break;
          /* Matching from the start of the host list. */
          HostListItem *item = label.list->first;
          int result = -1;
@@ -409,7 +576,7 @@ static bool fillpot_n1(MorphismPot *pot, Morphism *morphism)
          /* Matching from the end of the host list. */
          /* Check if the host list has passed "start". */
          if(item == start->prev) break;
-         /* Matching rule atom 2 */
+         /* Matching rule atom 3 */
          /* Matching string variable 2. */
          if(item->atom.type != 's') break;
          result = addStringAssignment(morphism, 2, item->atom.str);
@@ -427,6 +594,26 @@ static bool fillpot_n1(MorphismPot *pot, Morphism *morphism)
          }
          else break;
          item = item->prev;
+         /* Check if the host list has passed "start". */
+         if(item == start->prev) break;
+         /* Matching rule atom 2 */
+         /* Matching integer variable 3. */
+         if(item->atom.type != 'i') break;
+         result = addIntegerAssignment(morphism, 3, item->atom.num);
+         if(result >= 0)
+         {
+            new_assignments += result;
+            /* Update global booleans for the variable's predicates. */
+            evaluatePredicateinit_individual_7(morphism);
+            if(!evaluateCondition())
+            {
+               /* Reset the boolean variables in the predicates of this variable. */
+               init_individual_b7 = true;
+               break;
+            }
+         }
+         else break;
+         item = item->prev;
          /* Matching list variable 1. */
          if(item == start->prev) result = addListAssignment(morphism, 1, NULL);
          else if(item == start)
@@ -437,7 +624,7 @@ static bool fillpot_n1(MorphismPot *pot, Morphism *morphism)
          else
          {
             /* Assign to variable 1 the unmatched sublist of the host list. */
-            HostAtom sublist[label.length - 1];
+            HostAtom sublist[label.length - 2];
             int list_index = 0;
             HostListItem *iterator = start;
             while(iterator != item->next)
@@ -445,7 +632,7 @@ static bool fillpot_n1(MorphismPot *pot, Morphism *morphism)
                sublist[list_index++] = iterator->atom;
                iterator = iterator->next;
             }
-            HostList *list = makeHostList(sublist, label.length - 1, false);
+            HostList *list = makeHostList(sublist, label.length - 2, false);
             result = addListAssignment(morphism, 1, list);
             freeHostList(list);
          }

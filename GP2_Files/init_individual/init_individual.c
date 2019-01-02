@@ -20,6 +20,8 @@ Morphism *M_init_individual_updateDepth = NULL;
 Morphism *M_init_individual_decolourNode = NULL;
 #include "init_individual_connectOutput.h"
 Morphism *M_init_individual_connectOutput = NULL;
+#include "init_individual_connectOutput2.h"
+Morphism *M_init_individual_connectOutput2 = NULL;
 #include "init_individual_deleteNodeCounter.h"
 Morphism *M_init_individual_deleteNodeCounter = NULL;
 #include "init_individual_removeDepth.h"
@@ -36,6 +38,7 @@ static void init_individual_freeMorphisms(void)
    freeMorphism(M_init_individual_updateDepth);
    freeMorphism(M_init_individual_decolourNode);
    freeMorphism(M_init_individual_connectOutput);
+   freeMorphism(M_init_individual_connectOutput2);
    freeMorphism(M_init_individual_deleteNodeCounter);
    freeMorphism(M_init_individual_removeDepth);
    freeMorphism(M_init_individual_resetInput);
@@ -65,7 +68,8 @@ int init_individual_execute(Graph* host_graph)
    M_init_individual_addEdgeToArity = makeMorphism(4, 0, 7);
    M_init_individual_updateDepth = makeMorphism(2, 1, 7);
    M_init_individual_decolourNode = makeMorphism(1, 0, 1);
-   M_init_individual_connectOutput = makeMorphism(2, 0, 3);
+   M_init_individual_connectOutput = makeMorphism(3, 0, 5);
+   M_init_individual_connectOutput2 = makeMorphism(3, 0, 5);
    M_init_individual_deleteNodeCounter = makeMorphism(1, 0, 1);
    M_init_individual_removeDepth = makeMorphism(1, 0, 3);
    M_init_individual_resetInput = makeMorphism(1, 0, 2);
@@ -166,13 +170,13 @@ int init_individual_execute(Graph* host_graph)
    {
       /* Rule Call */
       emptyPot(init_individual_pot);
-      fillpotinit_individual_connectOutput(init_individual_pot, M_init_individual_connectOutput);
+      fillpotinit_individual_connectOutput2(init_individual_pot, M_init_individual_connectOutput2);
       if(potSize(init_individual_pot) > 0){
          MorphismHolder *holder = drawFromPot(init_individual_pot);
-         duplicateMorphism(holder->morphism, M_init_individual_connectOutput, init_individual_host);
+         duplicateMorphism(holder->morphism, M_init_individual_connectOutput2, init_individual_host);
          freeMorphism(holder->morphism);
          free(holder);
-         applyinit_individual_connectOutput(M_init_individual_connectOutput, false);
+         applyinit_individual_connectOutput2(M_init_individual_connectOutput2, false);
          init_individual_success = true;
       }
       else
